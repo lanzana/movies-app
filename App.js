@@ -14,6 +14,7 @@ const App = () => {
   getPopularMovies().then(movies => {
     setMovie(movies[0]);
   });
+  //
   return (
     <View
       style={{
