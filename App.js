@@ -1,19 +1,23 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Text, View} from 'react-native';
-import axios from 'axios';
-
-const getPopularMovies = async () => {
-  const resp = await axios.get(
-    'https://api.themoviedb.org/3/movie/popular?api_key=db7a0e2568ef2a325d6bcc4ee16a39ee',
-  );
-  return resp.data.results;
-};
+import {getPopularMovies} from './services/services';
 
 const App = () => {
-  const [movie, setMovie] = useState('');
-  getPopularMovies().then(movies => {
-    setMovie(movies[0]);
-  });
+  const [movie, setMovie] = useState(''); //cria a constante que vai tratar o state
+  const [error, setError] = useState(false);
+  useEffect(() => {
+    //useEffect nesse caso é usado para definir de quanto em quanto tempo será chamada a função getPopularMovies
+    getPopularMovies()
+      .then(movies => {
+        //.then usado para setar o movie usando o state aguardado
+        setMovie(movies[0]);
+      })
+      .catch(erro => {
+        //caso ocorra algum problema na api é usado outro state para apresentar o erro
+        setError(erro);
+      });
+  }, []);
+
   return (
     <View
       style={{
@@ -24,7 +28,9 @@ const App = () => {
       <Text>Movie Name: {movie.original_title}</Text>
       <Text>Language: {movie.original_language}</Text>
       <Text>Release Date: {movie.release_date}</Text>
+      {error && <Text style={{color: 'red'}}>Error in the server!</Text>}
     </View>
+    /**usado o <text> entre {} para validar se o state error não é falso, assim aparecendo  */
   );
 };
 export default App;
