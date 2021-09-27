@@ -1,16 +1,34 @@
 import React, {useEffect, useState} from 'react';
-import {Text, View} from 'react-native';
-import {getPopularMovies} from '../services/services';
+import {Text, View, StyleSheet, Dimensions, FlatList} from 'react-native';
+import {getPopularMovies, getUpcomingMovies} from '../services/services';
+import {SliderBox} from 'react-native-image-slider-box';
+import List from '../components/List'; //importar um arquivo PureComponent sem {}
 
+const dimension = Dimensions.get('screen');
 const Home = () => {
-  const [movie, setMovie] = useState(''); //cria a constante que vai tratar o state
+  const [moviesImages, setMoviesImages] = useState([]); //cria a constante que vai tratar o state
+  const [popularMovies, setPopularMovies] = useState('');
   const [error, setError] = useState(false);
+
   useEffect(() => {
     //useEffect nesse caso é usado para definir de quanto em quanto tempo será chamada a função getPopularMovies
+    getUpcomingMovies()
+      .then(movies => {
+        const moviesImagesArray = [];
+        movies.forEach(movie => {
+          moviesImagesArray.push(
+            'https://image.tmdb.org/t/p/w500' + movie.poster_path,
+          );
+        });
+        setMoviesImages(moviesImagesArray);
+      })
+      .catch(erro => {
+        setError(erro);
+      });
     getPopularMovies()
       .then(movies => {
         //.then usado para setar o movie usando o state aguardado
-        setMovie(movies[0]);
+        setPopularMovies(movies);
       })
       .catch(erro => {
         //caso ocorra algum problema na api é usado outro state para apresentar o erro
@@ -19,19 +37,39 @@ const Home = () => {
   }, []); //o segundo parâmetro da useEffect é o tempo em ms que será chamada novamente a função getPopularMovies
   //nesse caso passando [] para que só execute uma vez
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-      <Text>Movie Name: {movie.original_title}</Text>
-      <Text>Language: {movie.original_language}</Text>
-      <Text>Release Date: {movie.release_date}</Text>
-      {error && <Text style={{color: 'red'}}>Error in the server!</Text>}
-    </View>
+    <React.Fragment>
+      <View style={styles.sliderContainer}>
+        <SliderBox
+          images={moviesImages}
+          autoplay={true}
+          sliderBoxHeight={dimension.height / 1.5}
+          circleLoop={true}
+          dotStyle={styles.sliderDotStyle}></SliderBox>
+      </View>
+
+      <View style={styles.carousel}>
+        <List title={'Teste'} content={popularMovies}></List>
+      </View>
+    </React.Fragment>
+
     /**usado o <text> entre {} para validar se o state error não é falso, assim aparecendo  */
   );
 };
+
+const styles = StyleSheet.create({
+  sliderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sliderDotStyle: {
+    height: 0,
+  },
+  carousel: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
 
 export default Home;
