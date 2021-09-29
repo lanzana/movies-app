@@ -18,6 +18,7 @@ import Error from '../components/Error';
 const dimension = Dimensions.get('screen');
 const Home = ({navigation}) => {
   const [moviesImages, setMoviesImages] = useState(); //cria a constante que vai tratar o state
+  const [movieImagesId, setMoviesImagesId] = useState();
   const [popularMovies, setPopularMovies] = useState();
   const [popularTvShows, setPopularTvShow] = useState();
   const [error, setError] = useState(false);
@@ -36,11 +37,14 @@ const Home = ({navigation}) => {
       .then(([upcomingMoviesData, popularMoviesData, popularTvShowsData]) => {
         //.then usado para setar o movie usando o state aguardado
         const moviesImagesArray = [];
+        const moviesImagesIdArray = [];
         upcomingMoviesData.forEach(movie => {
           moviesImagesArray.push(
             'https://image.tmdb.org/t/p/w500' + movie.poster_path,
           );
+          moviesImagesIdArray.push(movie.id);
         });
+        setMoviesImagesId(moviesImagesIdArray);
         setMoviesImages(moviesImagesArray);
         setPopularMovies(popularMoviesData);
         setPopularTvShow(popularTvShowsData);
@@ -68,7 +72,12 @@ const Home = ({navigation}) => {
                 autoplay={true}
                 sliderBoxHeight={dimension.height / 1.5}
                 circleLoop={true}
-                dotStyle={styles.sliderDotStyle}></SliderBox>
+                dotStyle={styles.sliderDotStyle}
+                onCurrentImagePressed={index =>
+                  navigation.navigate('Detail', {
+                    movieId: movieImagesId[index],
+                  })
+                }></SliderBox>
             </View>
           )}
 
