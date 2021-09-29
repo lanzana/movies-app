@@ -16,7 +16,7 @@ import List from '../components/List'; //importar um arquivo PureComponent sem {
 import Error from '../components/Error';
 
 const dimension = Dimensions.get('screen');
-const Home = () => {
+const Home = ({navigation}) => {
   const [moviesImages, setMoviesImages] = useState(); //cria a constante que vai tratar o state
   const [popularMovies, setPopularMovies] = useState();
   const [popularTvShows, setPopularTvShow] = useState();
@@ -74,12 +74,18 @@ const Home = () => {
 
           {popularMovies && (
             <View style={styles.carousel}>
-              <List title="Popular Movies" content={popularMovies}></List>
+              <List
+                navigation={navigation}
+                title="Popular Movies"
+                content={popularMovies}></List>
             </View>
           )}
           {popularTvShows && (
             <View style={styles.carousel}>
-              <List title="Popular TV Shows" content={popularTvShows}></List>
+              <List
+                navigation={navigation}
+                title="Popular TV Shows"
+                content={popularTvShows}></List>
             </View>
           )}
         </ScrollView>
